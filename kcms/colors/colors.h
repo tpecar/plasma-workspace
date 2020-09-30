@@ -21,6 +21,7 @@
 
 #pragma once
 
+#include <QColor>
 #include <QPointer>
 #include <QQmlListReference>
 #include <QScopedPointer>
@@ -51,6 +52,8 @@ class KCMColors : public KQuickAddons::ManagedConfigModule
     Q_PROPERTY(ColorsSettings *colorsSettings READ colorsSettings CONSTANT)
     Q_PROPERTY(bool downloadingFile READ downloadingFile NOTIFY downloadingFileChanged)
 
+    Q_PROPERTY(QColor accentColor READ accentColor WRITE setAccentColor RESET resetAccentColor NOTIFY accentColorChanged)
+
 public:
     KCMColors(QObject *parent, const QVariantList &args);
     ~KCMColors() override;
@@ -66,6 +69,11 @@ public:
     FilterProxyModel *filteredModel() const;
     ColorsSettings *colorsSettings() const;
     bool downloadingFile() const;
+
+    QColor accentColor() const;
+    void setAccentColor(const QColor& accentColor);
+    void resetAccentColor();
+    Q_SIGNAL void accentColorChanged();
 
     Q_INVOKABLE void reloadModel(const QQmlListReference &changedEntries);
     Q_INVOKABLE void installSchemeFromFile(const QUrl &url);
@@ -90,6 +98,8 @@ private:
     void saveColors();
     void processPendingDeletions();
 
+    std::optional<QColor> savedAccentColor() const;
+
     void installSchemeFile(const QString &path);
 
     ColorsModel *m_model;
@@ -98,6 +108,8 @@ private:
 
     bool m_selectedSchemeDirty = false;
     bool m_activeSchemeEdited = false;
+
+    std::optional<QColor> m_accentColor;
 
     bool m_applyToAlien = true;
 

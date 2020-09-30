@@ -26,12 +26,57 @@
 
 #include <QDBusConnection>
 #include <QDBusMessage>
+#include <kcolorutils.h>
 
 static void copyEntry(KConfigGroup &from, KConfigGroup &to, const QString &entry)
 {
     if (from.hasKey(entry)) {
         to.writeEntry(entry, from.readEntry(entry));
     }
+}
+
+static QColor alphaBlend(const QColor &foreground, const QColor &background)
+{
+    const auto foregroundAlpha = foreground.alphaF();
+    const auto inverseForegroundAlpha = 1.0 - foregroundAlpha;
+    const auto backgroundAlpha = background.alphaF();
+
+    if (foregroundAlpha == 0.0) {
+        return background;
+    }
+
+    if (backgroundAlpha == 1.0) {
+        return QColor::fromRgb(
+            (foregroundAlpha*foreground.red()) + (inverseForegroundAlpha*background.red()),
+            (foregroundAlpha*foreground.green()) + (inverseForegroundAlpha*background.green()),
+            (foregroundAlpha*foreground.blue()) + (inverseForegroundAlpha*background.blue()),
+            0xff
+        );
+    } else {
+        const auto inverseBackgroundAlpha = (backgroundAlpha * inverseForegroundAlpha);
+        const auto finalAlpha = foregroundAlpha + inverseBackgroundAlpha;
+        Q_ASSERT(finalAlpha != 0.0);
+
+        return QColor::fromRgb(
+            (foregroundAlpha*foreground.red()) + (inverseBackgroundAlpha*background.red()),
+            (foregroundAlpha*foreground.green()) + (inverseBackgroundAlpha*background.green()),
+            (foregroundAlpha*foreground.blue()) + (inverseBackgroundAlpha*background.blue()),
+            finalAlpha
+        );
+    }
+}
+
+static QColor accentBackground(const QColor& accent, const QColor& background)
+{
+    auto c = accent;
+    // light bg
+    if (KColorUtils::luma(background) > 0.5) {
+        c.setAlphaF(0.7);
+    } else {
+    // dark bg
+        c.setAlphaF(0.4);
+    }
+    return alphaBlend(c, background);
 }
 
 void applyScheme(ColorsSettings *settings, ColorsModel *model)
@@ -63,6 +108,11 @@ void applyScheme(ColorsSettings *settings, ColorsModel *model)
                                       QStringLiteral("DecorationFocus"),
                                       QStringLiteral("DecorationHover")};
 
+    const QStringList accentList{QStringLiteral("ForegroundActive"),
+                                 QStringLiteral("ForegroundLink"),
+                                 QStringLiteral("DecorationFocus"),
+                                 QStringLiteral("DecorationHover")};
+
     for (auto item : colorSetGroupList) {
         settings->config()->deleteGroup(item);
 
@@ -70,7 +120,17 @@ void applyScheme(ColorsSettings *settings, ColorsModel *model)
         KConfigGroup targetGroup(settings->config(), item);
 
         for (auto entry : colorSetKeyList) {
-            copyEntry(sourceGroup, targetGroup, entry);
+            if (settings->config()->group("General").hasKey("AccentColor") && accentList.contains(entry)) {
+                targetGroup.writeEntry(entry, settings->accentColor());
+            } else {
+                copyEntry(sourceGroup, targetGroup, entry);
+            }
+        }
+
+        if (item == QStringLiteral("Colors:Selection") && settings->config()->group("General").hasKey("AccentColor")) {
+            for (auto entry : {QStringLiteral("BackgroundNormal"), QStringLiteral("BackgroundAlternate")}) {
+                targetGroup.writeEntry(entry, accentBackground(settings->accentColor(), config->group("Colors:View").readEntry<QColor>("BackgroundNormal", QColor())));
+            }
         }
 
         if (sourceGroup.hasGroup("Inactive")) {

@@ -23,11 +23,13 @@ import QtQuick.Layouts 1.1
 import QtQuick.Window 2.2
 import QtQuick.Dialogs 1.0 as QtDialogs
 import QtQuick.Controls 2.3 as QtControls
+import QtQuick.Templates 2.3 as T
 import QtQml 2.15
 
 import org.kde.kirigami 2.8 as Kirigami
 import org.kde.newstuff 1.62 as NewStuff
-import org.kde.kcm 1.3 as KCM
+import org.kde.kcm 1.5 as KCM
+import org.kde.kquickcontrols 2.0 as KQuickControls
 import org.kde.private.kcms.colors 1.0 as Private
 
 KCM.GridViewKCM {
@@ -55,6 +57,11 @@ KCM.GridViewKCM {
         configObject: kcm.colorsSettings
         settingName: "colorScheme"
         extraEnabledConditions: !kcm.downloadingFile
+    }
+
+    KCM.SettingHighlighter {
+        target: accentBox
+        highlight: Qt.colorEqual(kcm.accentColor, "transparent")
     }
 
     Component.onCompleted: {
@@ -128,6 +135,99 @@ KCM.GridViewKCM {
                         newProps.iconColor = Kirigami.Theme.textColor;
                         return newProps;
                     });
+                }
+            }
+        }
+
+        Kirigami.FormLayout {
+            Layout.fillWidth: true
+
+            QtControls.ButtonGroup {
+                buttons: [notAccentBox, accentBox]
+            }
+
+            QtControls.RadioButton {
+                id: notAccentBox
+
+                Kirigami.FormData.label: i18n("Use accent color:")
+                text: i18n("From current color scheme")
+
+                checked: Qt.colorEqual(kcm.accentColor, "transparent")
+                onToggled: {
+                    kcm.accentColor = undefined
+                }
+            }
+            RowLayout {
+                QtControls.RadioButton {
+                    id: accentBox
+                    checked: !Qt.colorEqual(kcm.accentColor, "transparent")
+                    text: i18n("Custom:")
+
+                    onToggled: {
+                        colorRepeater.itemAt(0).checked = true
+                    }
+                }
+                component ColorRadioButton : T.RadioButton {
+                    id: control
+                    opacity: accentBox.checked ? 1.0 : 0.5
+
+                    property color color: "transparent"
+
+                    MouseArea {
+                        enabled: false
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                    }
+
+                    implicitWidth: Math.round(Kirigami.Units.gridUnit * 1.25)
+                    implicitHeight: Math.round(Kirigami.Units.gridUnit * 1.25)
+
+                    background: Rectangle {
+                        color: control.color
+                        radius: height / 2
+                        border {
+                            color: Qt.rgba(0, 0, 0, 0.15)
+                            width: control.visualFocus ? 2 : 0
+                        }
+                    }
+                    indicator: Rectangle {
+                        color: "white"
+                        radius: height / 2
+                        visible: control.checked
+                        anchors {
+                            fill: parent
+                            margins: Math.round(Kirigami.Units.smallSpacing * 1.25)
+                        }
+                        border {
+                            color: Qt.rgba(0, 0, 0, 0.15)
+                            width: 1
+                        }
+                    }
+                }
+                Repeater {
+                    id: colorRepeater
+
+                    model: [
+                        "#e93a9a",
+                        "#e93d58",
+                        "#e9643a",
+                        "#e8cb2d",
+                        "#3dd425",
+                        "#00d3b8",
+                        "#3daee9",
+                        "#b875dc",
+                        "#926ee4",
+                        "#686b6f",
+                    ]
+                    delegate: ColorRadioButton {
+                        color: modelData
+                        checked: Qt.colorEqual(kcm.accentColor, modelData)
+
+                        onToggled: {
+                            accentBox.checked = true
+                            kcm.accentColor = modelData
+                        }
+                    }
                 }
             }
         }
