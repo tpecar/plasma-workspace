@@ -156,6 +156,15 @@ void PowerManagementJob::start()
             },
             this);
         return;
+    } else if (operation == QLatin1String("setPowerProfile")) {
+        auto pending = setPowerProfile(parameters().value(QStringLiteral("profile")).toString());
+        callWhenFinished(
+            pending,
+            [this] {
+                setResult(true);
+            },
+            this);
+        return;
     }
 
     qDebug() << "don't know what to do with " << operation;
@@ -178,6 +187,16 @@ QDBusPendingCall PowerManagementJob::setKeyboardBrightness(int value, bool silen
                                                       QStringLiteral("/org/kde/Solid/PowerManagement/Actions/KeyboardBrightnessControl"),
                                                       QStringLiteral("org.kde.Solid.PowerManagement.Actions.KeyboardBrightnessControl"),
                                                       silent ? "setKeyboardBrightnessSilent" : "setKeyboardBrightness");
+    msg << value;
+    return QDBusConnection::sessionBus().asyncCall(msg);
+}
+
+QDBusPendingCall PowerManagementJob::setPowerProfile(const QString &value)
+{
+    QDBusMessage msg = QDBusMessage::createMethodCall(QStringLiteral("org.kde.Solid.PowerManagement"),
+                                                      QStringLiteral("/org/kde/Solid/PowerManagement/Actions/PowerProfile"),
+                                                      QStringLiteral("org.kde.Solid.PowerManagement.Actions.PowerProfile"),
+                                                      QStringLiteral("setProfile"));
     msg << value;
     return QDBusConnection::sessionBus().asyncCall(msg);
 }
