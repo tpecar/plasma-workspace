@@ -1,6 +1,6 @@
 /*  This file is part of the KDE project
-    Copyright (C) 2008 Matthias Kretz <kretz@kde.org>
-    Copyright (C) 2011 David Faure <faure@kde.org>
+    SPDX-FileCopyrightText: 2008 Matthias Kretz <kretz@kde.org>
+    SPDX-FileCopyrightText: 2011 David Faure <faure@kde.org>
 
     This library is free software; you can redistribute it and/or
     modify it under the terms of the GNU Lesser General Public
