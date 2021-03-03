@@ -101,7 +101,7 @@ bool AppEntry::isValid() const
 
 QIcon AppEntry::icon() const
 {
-    if (m_icon.isNull()) {
+    if (m_icon.isNull() && m_service) {
         if (QFileInfo::exists(m_service->icon())) {
             m_icon = QIcon(m_service->icon());
         } else {
