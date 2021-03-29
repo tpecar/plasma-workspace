@@ -16,9 +16,6 @@ qt5_generate_dbus_interface( ${kcminit_adaptor} ${kcminit_xml} )
 qt5_add_dbus_interface( plasma_session_SRCS ${kcminit_xml} kcminit_interface )
 qt5_add_dbus_interface( plasma_session_SRCS ${KDED_DBUS_INTERFACE} kded_interface )
 
-set(klauncher_xml ${KINIT_DBUS_INTERFACES_DIR}/kf5_org.kde.KLauncher.xml)
-qt5_add_dbus_interface( plasma_session_SRCS ${klauncher_xml} klauncher_interface )
-
 qt5_add_dbus_interface( plasma_session_SRCS ../../ksmserver/org.kde.KSMServerInterface.xml ksmserver_interface )
 
 
