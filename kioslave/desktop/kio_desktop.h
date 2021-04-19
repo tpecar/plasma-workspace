@@ -40,7 +40,7 @@ protected:
     void virtual_hook(int id, void *data) override;
 
 private:
-    void fileSystemFreeSpace(const QUrl &url);
+    void fileSystemFreeSpace(const QUrl &);
 };
 
 #endif
