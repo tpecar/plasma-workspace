@@ -24,6 +24,20 @@ QString LocaleListModel::getFlag(int index) const
     }
     return m_parent->loadFlagIcon(flagcode);
 }
+QString LocaleListModel::getText(int index) const
+{
+    if (index < 0 || index > (int)m_locales.size())
+        return {};
+
+    auto locale = m_locales.at(index);
+    const QString clabel = !locale.nativeCountryName().isEmpty() ? locale.nativeCountryName() : QLocale::countryToString(locale.country());
+    const QString nativeLangName = locale.nativeLanguageName();
+    if (!nativeLangName.isEmpty()) {
+        return QString(i18n("%1 - %2 (%3)", clabel, nativeLangName, locale.name()));
+    } else {
+        return QString(i18n("%1 (%2)", clabel, locale.name()));
+    }
+}
 QVariant LocaleListModel::data(const QModelIndex &index, int role) const
 {
     if (!index.isValid() || index.row() < 0 || index.row() > (int)m_locales.size())

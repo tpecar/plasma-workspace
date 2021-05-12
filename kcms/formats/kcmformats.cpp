@@ -125,7 +125,7 @@ void KCMFormats::writeConfig()
 {
     m_config = KConfigGroup(KSharedConfig::openConfig(configFile), "Formats");
 
-    const QString global = m_localeModel->localeAt(m_globalIndex).name();
+    const QString global = m_localeModel->localeAt(m_langIndex).name();
 
     if (m_detail) {
         // Global setting, clean up config

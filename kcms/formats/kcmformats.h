@@ -21,19 +21,23 @@
 
 #include <KQuickAddons/ManagedConfigModule>
 #include <KConfigGroup>
+#include <KLocalizedString>
 #include "localelistmodel.h"
 class KCMFormats : public KQuickAddons::ManagedConfigModule
 {
     Q_OBJECT
     Q_PROPERTY(LocaleListModel *localeModel READ localeModel NOTIFY localeModelChanged)
     Q_PROPERTY(bool detailed READ detailed WRITE setDetailed NOTIFY detailedChanged)
-    Q_PROPERTY(int globalIndex READ globalIndex WRITE setGlobalIndex NOTIFY globalIndexChanged)
     Q_PROPERTY(int langIndex READ langIndex WRITE setLangIndex NOTIFY langIndexChanged)
     Q_PROPERTY(int numericIndex READ numericIndex WRITE setNumericIndex NOTIFY numericIndexChanged)
     Q_PROPERTY(int timeIndex READ timeIndex WRITE setTimeIndex NOTIFY timeIndexChanged)
     Q_PROPERTY(int collateIndex READ collateIndex WRITE setCollateIndex NOTIFY collateIndexChanged)
     Q_PROPERTY(int monetaryIndex READ monetaryIndex WRITE setMonetaryIndex NOTIFY monetaryIndexChanged)
     Q_PROPERTY(int measurementIndex READ measurementIndex WRITE setMeasurementIndex NOTIFY measurementIndexChanged)
+    Q_PROPERTY(QString numberExample READ numberExample NOTIFY numericIndexChanged)
+    Q_PROPERTY(QString timeExample READ timeExample NOTIFY timeIndexChanged)
+    Q_PROPERTY(QString currencyExample READ currencyExample NOTIFY monetaryIndexChanged)
+    Q_PROPERTY(QString measurementSetting READ measurementSetting NOTIFY measurementIndexChanged)
 public:
     explicit KCMFormats(QObject *parent = nullptr, const QVariantList &list = QVariantList());
     virtual ~KCMFormats() override = default;
@@ -47,48 +51,72 @@ public:
     }
     void setDetailed(bool detail) {
         m_detail = detail;
-    }
-    int globalIndex() const {
-        return m_globalIndex;
-    }
-    void setGlobalIndex(int index) {
-        m_globalIndex = index;
+        Q_EMIT detailedChanged();
     }
     int langIndex() const {
         return m_langIndex;
     }
     void setLangIndex(int index) {
         m_langIndex = index;
+        Q_EMIT langIndexChanged();
     }
     int numericIndex() const {
         return m_numericIndex;
     }
     void setNumericIndex(int index) {
         m_numericIndex = index;
+        Q_EMIT numericIndexChanged();
     }
     int timeIndex() const {
         return m_timeIndex;
     }
     void setTimeIndex(int index) {
         m_timeIndex = index;
+        Q_EMIT timeIndexChanged();
     }
     int collateIndex() const {
         return m_collateIndex;
     }
     void setCollateIndex(int index) {
         m_collateIndex = index;
+        Q_EMIT collateIndexChanged();
     }
     int monetaryIndex() const {
         return m_monetaryIndex;
     }
     void setMonetaryIndex(int index) {
         m_monetaryIndex = index;
+        Q_EMIT monetaryIndexChanged();
     }
     int measurementIndex() const {
         return m_measurementIndex;
     }
     void setMeasurementIndex(int index) {
         m_measurementIndex = index;
+        Q_EMIT measurementIndexChanged();
+    }
+    QString numberExample() const {
+        return m_localeModel->localeAt(m_numericIndex).toString(1000.01);
+    }
+    QString timeExample() const {
+        auto tloc = m_localeModel->localeAt(m_timeIndex);
+        return i18n("%1 (long format)", tloc.toString(QDateTime::currentDateTime())) + QLatin1Char('\n')
+                + i18n("%1 (short format)", tloc.toString(QDateTime::currentDateTime(), QLocale::ShortFormat));
+    }
+    QString currencyExample() const {
+        return m_localeModel->localeAt(m_monetaryIndex).toCurrencyString(24.00);
+    }
+    QString measurementSetting() const {
+        auto mloc = m_localeModel->localeAt(m_measurementIndex);
+        QString measurementSetting;
+            if (mloc.measurementSystem() == QLocale::ImperialUKSystem) {
+                measurementSetting = i18nc("Measurement combobox", "Imperial UK");
+            } else if (mloc.measurementSystem() == QLocale::ImperialUSSystem || mloc.measurementSystem() == QLocale::ImperialSystem) {
+                measurementSetting = i18nc("Measurement combobox", "Imperial US");
+            } else {
+                measurementSetting = i18nc("Measurement combobox", "Metric");
+            }
+            return measurementSetting;
     }
 public Q_SLOTS:
     void load() override;
@@ -97,7 +125,6 @@ public Q_SLOTS:
 Q_SIGNALS:
     void localeModelChanged();
     void detailedChanged();
-    void globalIndexChanged();
     void langIndexChanged();
     void numericIndexChanged();
     void timeIndexChanged();
@@ -115,7 +142,7 @@ private:
     LocaleListModel *m_localeModel = nullptr;
 
     bool m_detail = false;
-    int m_globalIndex = -1, m_langIndex = -1, m_numericIndex = -1, m_timeIndex = -1,
+    int m_langIndex = -1, m_numericIndex = -1, m_timeIndex = -1,
         m_collateIndex = -1, m_monetaryIndex = -1, m_measurementIndex = -1;
 };
 
