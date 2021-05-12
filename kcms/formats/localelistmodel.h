@@ -16,6 +16,7 @@ public:
     void init(const QList<QLocale> &locales);
     int findIndexFromLocale(const QLocale &locale) const;
     QLocale localeAt(int index) const;
+    Q_INVOKABLE QString getFlag(int index) const;
 private:
     QString loadFlagIcon(const QString &flagCode) const;
 
