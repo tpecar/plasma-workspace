@@ -37,7 +37,7 @@ kcoreaddons_desktop_to_json(kcm_formats "package/metadata.desktop")
 
 target_link_libraries(kcm_formats
     Qt5::Core
-    KF5::Config
+    KF5::ConfigCore
     KF5::CoreAddons
     KF5::I18n
     KF5::QuickAddons)
@@ -46,4 +46,4 @@ target_link_libraries(kcm_formats
 ########### install files ###############
 install(TARGETS kcm_formats  DESTINATION ${KDE_INSTALL_PLUGINDIR}/kcms )
 install(FILES package/metadata.desktop RENAME kcm_formats.desktop DESTINATION ${KDE_INSTALL_KSERVICES5DIR})
-kpackage_install_package(package kcm_time kcms)
+kpackage_install_package(package kcm_formats kcms)

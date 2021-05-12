@@ -20,7 +20,7 @@
 #define __kcmformats_h__
 
 #include <KQuickAddons/ManagedConfigModule>
-#include <KConfigCore/KConfigGroup>
+#include <KConfigGroup>
 #include "localelistmodel.h"
 class KCMFormats : public KQuickAddons::ManagedConfigModule
 {
@@ -42,6 +42,54 @@ public:
         return m_localeModel;
     };
     QString loadFlagIcon(const QString &flagCode);
+    bool detailed() const {
+        return m_detail;
+    }
+    void setDetailed(bool detail) {
+        m_detail = detail;
+    }
+    int globalIndex() const {
+        return m_globalIndex;
+    }
+    void setGlobalIndex(int index) {
+        m_globalIndex = index;
+    }
+    int langIndex() const {
+        return m_langIndex;
+    }
+    void setLangIndex(int index) {
+        m_langIndex = index;
+    }
+    int numericIndex() const {
+        return m_numericIndex;
+    }
+    void setNumericIndex(int index) {
+        m_numericIndex = index;
+    }
+    int timeIndex() const {
+        return m_timeIndex;
+    }
+    void setTimeIndex(int index) {
+        m_timeIndex = index;
+    }
+    int collateIndex() const {
+        return m_collateIndex;
+    }
+    void setCollateIndex(int index) {
+        m_collateIndex = index;
+    }
+    int monetaryIndex() const {
+        return m_monetaryIndex;
+    }
+    void setMonetaryIndex(int index) {
+        m_monetaryIndex = index;
+    }
+    int measurementIndex() const {
+        return m_measurementIndex;
+    }
+    void setMeasurementIndex(int index) {
+        m_measurementIndex = index;
+    }
 public Q_SLOTS:
     void load() override;
     void save() override;

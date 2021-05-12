@@ -4,7 +4,6 @@
 #include <KLocalizedString>
 LocaleListModel::LocaleListModel(KCMFormats *parent)
     : m_parent(parent)
-
 {
 }
 int LocaleListModel::rowCount(const QModelIndex &parent) const

@@ -21,7 +21,7 @@
 // own
 #include "kcmformats.h"
 #include <KPluginFactory>
-#include <KConfigCore/KSharedConfig>
+#include <KSharedConfig>
 #include <KLocalizedString>
 #include <KAboutData>
 
