@@ -1,28 +1,3 @@
-
-set(QT_MIN_VERSION "5.14.0")
-set(KF5_MIN_VERSION "5.73.0")
-
-find_package(ECM ${KF5_MIN_VERSION} REQUIRED NO_MODULE)
-set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
-
-include(KDEInstallDirs)
-include(KDECMakeSettings)
-include(KDEFrameworkCompilerSettings NO_POLICY_SCOPE)
-
-find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
-    Core
-    Quick
-    Svg
-)
-
-find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS
-    I18n
-    KCMUtils
-    Declarative
-    Config
-)
-
-
 # KI18N Translation Domain for this library
 #add_definitions(-DTRANSLATION_DOMAIN=\"kcmformats\")
 

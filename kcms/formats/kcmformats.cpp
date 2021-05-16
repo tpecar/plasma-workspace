@@ -45,7 +45,22 @@ KCMFormats::KCMFormats(QObject *parent, const QVariantList &args)
         setAboutData(aboutData);
         setButtons(Help | Apply | Default);
 }
+void KCMFormats::setLangIndex(int index)
+{
+    if (index == m_langIndex)
+        return;
 
+    m_langIndex = index;
+    if (!m_detail) {
+        m_numericIndex = index;
+        m_timeIndex = index;
+        m_monetaryIndex = index;
+        m_collateIndex = index;
+        m_measurementIndex = index;
+        update();
+    } else
+        Q_EMIT langIndexChanged();
+}
 bool countryLessThan(const QLocale &c1, const QLocale &c2)
 {
     // Ensure that the "Default (C)" locale always appears at the top
@@ -65,6 +80,14 @@ void KCMFormats::load()
     std::sort(allLocales.begin(), allLocales.end(), countryLessThan);
     m_localeModel->init(allLocales);
     readConfig();
+
+    //    connect(this, &KCMFormats::langIndexChanged, this, &KCMFormats::settingsChanged);
+    //    connect(this, &KCMFormats::numericIndexChanged, this, &KCMFormats::settingsChanged);
+    //    connect(this, &KCMFormats::detailedChanged, this, &KCMFormats::settingsChanged);
+    //    connect(this, &KCMFormats::collateIndexChanged, this, &KCMFormats::settingsChanged);
+    //    connect(this, &KCMFormats::monetaryIndexChanged, this, &KCMFormats::settingsChanged);
+    //    connect(this, &KCMFormats::measurementIndexChanged, this, &KCMFormats::settingsChanged);
+    //    connect(this, &KCMFormats::timeIndexChanged, this, &KCMFormats::settingsChanged);
 }
 
 QString KCMFormats::loadFlagIcon(const QString &flagCode)
@@ -193,34 +216,16 @@ void KCMFormats::writeConfig()
 void KCMFormats::save()
 {
     writeConfig();
-//    KMessageBox::information(this,
-//                             i18n("Your changes will take effect the next time you log in."),
-//                             i18n("Format Settings Changed"),
-//                             QStringLiteral("FormatSettingsChanged"));
+    Q_EMIT saveClicked();
+    //    KMessageBox::information(this,
+    //                             i18n("Your changes will take effect the next time you log in."),
+    //                             i18n("Format Settings Changed"),
+    //                             QStringLiteral("FormatSettingsChanged"));
 }
 
 void KCMFormats::defaults()
 {
-    m_config = KConfigGroup(KSharedConfig::openConfig(configFile), "Formats");
-
-    m_detail = false;
-    Q_EMIT detailedChanged();
-
-    QLocale lang_locale(m_config.readEntry(lcLang, QString::fromUtf8(qgetenv(lcLang.toLatin1().data()))));
-    QLocale numeric_locale(m_config.readEntry(lcLang, QString::fromUtf8(qgetenv(lcNumeric.toLatin1().data()))));
-    QLocale time_locale(m_config.readEntry(lcLang, QString::fromUtf8(qgetenv(lcTime.toLatin1().data()))));
-    QLocale collate_locale(m_config.readEntry(lcLang, QString::fromUtf8(qgetenv(lcCollate.toLatin1().data()))));
-    QLocale monetary_locale(m_config.readEntry(lcLang, QString::fromUtf8(qgetenv(lcMonetary.toLatin1().data()))));
-    QLocale measurement_locale(m_config.readEntry(lcLang, QString::fromUtf8(qgetenv(lcMeasurement.toLatin1().data()))));
-
-    m_langIndex = m_localeModel->findIndexFromLocale(lang_locale);
-    m_numericIndex = m_localeModel->findIndexFromLocale(numeric_locale);
-    m_timeIndex = m_localeModel->findIndexFromLocale(time_locale);
-    m_collateIndex = m_localeModel->findIndexFromLocale(collate_locale);
-    m_monetaryIndex = m_localeModel->findIndexFromLocale(monetary_locale);
-    m_measurementIndex = m_localeModel->findIndexFromLocale(measurement_locale);
-
-    update();
+    readConfig();
 }
 void KCMFormats::update()
 {
@@ -230,5 +235,10 @@ void KCMFormats::update()
     Q_EMIT collateIndexChanged();
     Q_EMIT monetaryIndexChanged();
     Q_EMIT measurementIndexChanged();
+    Q_EMIT numericExampleChanged();
+    Q_EMIT timeExampleChanged();
+    Q_EMIT collateExampleChanged();
+    Q_EMIT monetaryExampleChanged();
+    Q_EMIT measurementExampleChanged();
 }
 #include "kcmformats.moc"

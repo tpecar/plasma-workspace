@@ -34,10 +34,10 @@ class KCMFormats : public KQuickAddons::ManagedConfigModule
     Q_PROPERTY(int collateIndex READ collateIndex WRITE setCollateIndex NOTIFY collateIndexChanged)
     Q_PROPERTY(int monetaryIndex READ monetaryIndex WRITE setMonetaryIndex NOTIFY monetaryIndexChanged)
     Q_PROPERTY(int measurementIndex READ measurementIndex WRITE setMeasurementIndex NOTIFY measurementIndexChanged)
-    Q_PROPERTY(QString numberExample READ numberExample NOTIFY numericIndexChanged)
-    Q_PROPERTY(QString timeExample READ timeExample NOTIFY timeIndexChanged)
-    Q_PROPERTY(QString currencyExample READ currencyExample NOTIFY monetaryIndexChanged)
-    Q_PROPERTY(QString measurementSetting READ measurementSetting NOTIFY measurementIndexChanged)
+    Q_PROPERTY(QString numberExample READ numberExample NOTIFY numericExampleChanged)
+    Q_PROPERTY(QString timeExample READ timeExample NOTIFY timeExampleChanged)
+    Q_PROPERTY(QString currencyExample READ currencyExample NOTIFY monetaryExampleChanged)
+    Q_PROPERTY(QString measurementSetting READ measurementSetting NOTIFY measurementExampleChanged)
 public:
     explicit KCMFormats(QObject *parent = nullptr, const QVariantList &list = QVariantList());
     virtual ~KCMFormats() override = default;
@@ -56,44 +56,41 @@ public:
     int langIndex() const {
         return m_langIndex;
     }
-    void setLangIndex(int index) {
-        m_langIndex = index;
-        Q_EMIT langIndexChanged();
-    }
+    void setLangIndex(int index);
     int numericIndex() const {
         return m_numericIndex;
     }
     void setNumericIndex(int index) {
         m_numericIndex = index;
-        Q_EMIT numericIndexChanged();
+        Q_EMIT numericExampleChanged();
     }
     int timeIndex() const {
         return m_timeIndex;
     }
     void setTimeIndex(int index) {
         m_timeIndex = index;
-        Q_EMIT timeIndexChanged();
+        Q_EMIT timeExampleChanged();
     }
     int collateIndex() const {
         return m_collateIndex;
     }
     void setCollateIndex(int index) {
         m_collateIndex = index;
-        Q_EMIT collateIndexChanged();
+        Q_EMIT collateExampleChanged();
     }
     int monetaryIndex() const {
         return m_monetaryIndex;
     }
     void setMonetaryIndex(int index) {
         m_monetaryIndex = index;
-        Q_EMIT monetaryIndexChanged();
+        Q_EMIT monetaryExampleChanged();
     }
     int measurementIndex() const {
         return m_measurementIndex;
     }
     void setMeasurementIndex(int index) {
         m_measurementIndex = index;
-        Q_EMIT measurementIndexChanged();
+        Q_EMIT measurementExampleChanged();
     }
     QString numberExample() const {
         return m_localeModel->localeAt(m_numericIndex).toString(1000.01);
@@ -131,6 +128,13 @@ Q_SIGNALS:
     void collateIndexChanged();
     void monetaryIndexChanged();
     void measurementIndexChanged();
+    void numericExampleChanged();
+    void timeExampleChanged();
+    void collateExampleChanged();
+    void monetaryExampleChanged();
+    void measurementExampleChanged();
+    void saveClicked();
+
 private:
     QHash<QString, QString> m_cachedFlags;
 

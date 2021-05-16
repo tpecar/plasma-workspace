@@ -18,12 +18,16 @@ SimpleKCM {
                 text: i18n("Region:")
             }
             FormatComboBox {
-                index: kcm.langIndex
+                id: langCombo
+                currentIndex: kcm.langIndex
+                onCurrentIndexChanged: kcm.langIndex = currentIndex
             }
         }
         
         CheckBox {
             id: detailCheckBox
+            checked: kcm.detailed
+            onCheckedChanged: if (kcm.detailed != checked) kcm.detailed = checked
             text: i18n("detail")
         }
         
@@ -34,8 +38,10 @@ SimpleKCM {
                 color: enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
             }
             FormatComboBox {
+                id: numericCombo
                 enabled: detailCheckBox.checked
-                index: kcm.numericIndex
+                currentIndex: kcm.numericIndex
+                onCurrentIndexChanged: kcm.numericIndex = currentIndex
             }
         }
         
@@ -46,8 +52,10 @@ SimpleKCM {
                 color: enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
             }
             FormatComboBox {
+                id: timeCombo
                 enabled: detailCheckBox.checked
-                index: kcm.timeIndex
+                currentIndex: kcm.timeIndex
+                onCurrentIndexChanged: kcm.timeIndex = currentIndex
             }
         }
         
@@ -58,8 +66,10 @@ SimpleKCM {
                 color: enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
             }
             FormatComboBox {
+                id: monetaryCombo
                 enabled: detailCheckBox.checked
-                index: kcm.monetaryIndex
+                currentIndex: kcm.monetaryIndex
+                onCurrentIndexChanged: kcm.monetaryIndex = currentIndex
             }
         }
         
@@ -70,8 +80,10 @@ SimpleKCM {
                 color: enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
             }
             FormatComboBox {
+                id: measurementCombo
                 enabled: detailCheckBox.checked
-                index: kcm.measurementIndex
+                currentIndex: kcm.measurementIndex
+                onCurrentIndexChanged: kcm.measurementIndex = currentIndex
             }
         }
         RowLayout {
@@ -81,11 +93,17 @@ SimpleKCM {
                 color: enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
             }
             FormatComboBox {
+                id: collateCombo
                 enabled: detailCheckBox.checked
-                index: kcm.collateIndex
+                currentIndex: kcm.collateIndex
+                onCurrentIndexChanged: kcm.collateIndex = currentIndex
             }
         }
         
+        Label {
+            text: kcm.monetaryIndex
+        }
+
         Label {
             text: i18n("Description")
             font.bold: true
@@ -101,6 +119,24 @@ SimpleKCM {
         }
         Label {
             text: i18n("Measurement Units: ") + kcm.measurementSetting
+        }
+    }
+
+    Dialog {
+        id: dialog
+        title: i18n("Format Settings Changed")
+        contentItem: Label {
+            text: i18n("Your changes will take effect the next time you log in.")
+        }
+
+        modal: true
+        standardButtons: Dialog.Ok
+
+        Connections {
+            target: kcm
+            function onSaveClicked() {
+                dialog.open()
+            }
         }
     }
 }
