@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+      http://www.kde.org/standards/kcfg/1.0/kcfg.xsd" >
+  <kcfgfile name="plasma-localerc" />
+  <group name="Formats">
+    <entry name="useDetailed" type="Bool">
+    </entry>
+    <entry name="LANG" type="String">
+      <label>Forecast Style</label>
+    </entry>
+    <entry name="LC_NUMERIC" type="String">
+    </entry>
+    <entry name="LC_TIME" type="String">
+    </entry>
+    <entry name="LC_MONETARY" type="String">
+    </entry>
+    <entry name="LC_MEASUREMENT" type="String">
+    </entry>
+    <entry name="LC_COLLATE" type="String">
+    </entry>
+    <entry name="LC_CTYPE" type="String">
+    </entry>
+    <entry name="LANGUAGE" type="String">
+    </entry>
+  </group>
+</kcfg>

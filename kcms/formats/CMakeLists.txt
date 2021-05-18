@@ -6,6 +6,8 @@ set(kcm_formats_PART_SRCS
     localelistmodel.cpp
 )
 
+kconfig_add_kcfg_files(kcm_formats_PART_SRCS formatssettings.kcfgc GENERATE_MOC)
+
 add_library(kcm_formats MODULE ${kcm_formats_PART_SRCS})
 
 kcoreaddons_desktop_to_json(kcm_formats "package/metadata.desktop")
