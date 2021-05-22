@@ -308,6 +308,12 @@ void AutostartModel::addScript(const QUrl &url, AutostartModel::AutostartEntrySo
         return;
     }
 
+    QFile scriptFile(url.toLocalFile());
+
+    if (!(scriptFile.permissions() & QFile::ExeUser)) {
+        Q_EMIT nonExecutableScript(url.toLocalFile());
+    }
+
     const QString fileName = url.fileName();
 
     if (kind == AutostartModel::AutostartEntrySource::XdgScripts) {
@@ -419,4 +425,11 @@ void AutostartModel::editApplication(int row, QQuickItem *context)
         }
     });
     dlg->open();
+}
+
+void AutostartModel::makeFileExecutable(const QString &fileName)
+{
+    QFile file(fileName);
+
+    file.setPermissions(file.permissions() | QFile::ExeUser);
 }
