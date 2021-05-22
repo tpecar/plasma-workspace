@@ -13,7 +13,7 @@ int LocaleListModel::rowCount(const QModelIndex &parent) const
 }
 QString LocaleListModel::getFlag(int index) const
 {
-    if (index < 0 || index > (int)m_locales.size())
+    if (index < 0 || index >= (int)m_locales.size())
         return {};
 
     auto locale = m_locales.at(index);
@@ -26,7 +26,7 @@ QString LocaleListModel::getFlag(int index) const
 }
 QString LocaleListModel::getText(int index) const
 {
-    if (index < 0 || index > (int)m_locales.size())
+    if (index < 0 || index >= (int)m_locales.size())
         return {};
 
     auto locale = m_locales.at(index);
@@ -40,7 +40,7 @@ QString LocaleListModel::getText(int index) const
 }
 QVariant LocaleListModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || index.row() < 0 || index.row() > (int)m_locales.size())
+    if (!index.isValid() || index.row() < 0 || index.row() >= (int)m_locales.size())
         return {};
 
     auto locale = m_locales.at(index.row());

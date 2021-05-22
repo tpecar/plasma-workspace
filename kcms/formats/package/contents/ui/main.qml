@@ -11,8 +11,9 @@ import org.kde.kirigami 2.7 as Kirigami
 import org.kde.kcm 1.2
 
 SimpleKCM {
+    id: root
     implicitHeight: 500
-    ColumnLayout {
+    Kirigami.FormLayout {
         RowLayout {
             Label {
                 text: i18n("Region:")
@@ -41,6 +42,7 @@ SimpleKCM {
                 id: numericCombo
                 enabled: detailCheckBox.checked
                 currentIndex: kcm.numericIndex
+                displayText: !detailCheckBox.checked ? i18n("No change") : currentText
                 onCurrentIndexChanged: kcm.numericIndex = currentIndex
             }
         }
@@ -55,6 +57,7 @@ SimpleKCM {
                 id: timeCombo
                 enabled: detailCheckBox.checked
                 currentIndex: kcm.timeIndex
+                displayText: !detailCheckBox.checked ? i18n("No change") : currentText
                 onCurrentIndexChanged: kcm.timeIndex = currentIndex
             }
         }
@@ -69,6 +72,7 @@ SimpleKCM {
                 id: monetaryCombo
                 enabled: detailCheckBox.checked
                 currentIndex: kcm.monetaryIndex
+                displayText: !detailCheckBox.checked ? i18n("No change") : currentText
                 onCurrentIndexChanged: kcm.monetaryIndex = currentIndex
             }
         }
@@ -83,6 +87,7 @@ SimpleKCM {
                 id: measurementCombo
                 enabled: detailCheckBox.checked
                 currentIndex: kcm.measurementIndex
+                displayText: !detailCheckBox.checked ? i18n("No change") : currentText
                 onCurrentIndexChanged: kcm.measurementIndex = currentIndex
             }
         }
@@ -96,12 +101,9 @@ SimpleKCM {
                 id: collateCombo
                 enabled: detailCheckBox.checked
                 currentIndex: kcm.collateIndex
+                displayText: !detailCheckBox.checked ? i18n("No change") : currentText
                 onCurrentIndexChanged: kcm.collateIndex = currentIndex
             }
-        }
-        
-        Label {
-            text: kcm.monetaryIndex
         }
 
         Label {
@@ -118,25 +120,21 @@ SimpleKCM {
             text: i18n("Currency: ") + kcm.currencyExample
         }
         Label {
-            text: i18n("Measurement Units: ") + kcm.measurementSetting
+            text: i18n("Measurement Units: ") + kcm.measurementExample
         }
     }
 
-    Dialog {
-        id: dialog
-        title: i18n("Format Settings Changed")
-        contentItem: Label {
-            text: i18n("Your changes will take effect the next time you log in.")
-        }
 
-        modal: true
-        standardButtons: Dialog.Ok
-
-        Connections {
-            target: kcm
-            function onSaveClicked() {
-                dialog.open()
-            }
+    header: Kirigami.InlineMessage {
+        id: message
+        text: i18n("Your changes will take effect the next time you log in.")
+        type: Kirigami.MessageType.Positive
+    }
+    Connections {
+        target: kcm
+        function onSaveClicked() {
+            message.visible = true
         }
     }
+
 }

@@ -4,6 +4,7 @@
 set(kcm_formats_PART_SRCS
     kcmformats.cpp
     localelistmodel.cpp
+    formatssettings.cpp
 )
 
 kconfig_add_kcfg_files(kcm_formats_PART_SRCS formatssettings.kcfgc GENERATE_MOC)
@@ -15,6 +16,7 @@ kcoreaddons_desktop_to_json(kcm_formats "package/metadata.desktop")
 target_link_libraries(kcm_formats
     Qt5::Core
     KF5::ConfigCore
+    KF5::ConfigGui
     KF5::CoreAddons
     KF5::I18n
     KF5::QuickAddons)

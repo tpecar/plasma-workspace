@@ -19,16 +19,18 @@
 #include <QtGlobal>
 
 // own
+#include "formatssettings.h"
 #include "kcmformats.h"
+#include <KAboutData>
+#include <KLocalizedString>
 #include <KPluginFactory>
 #include <KSharedConfig>
-#include <KLocalizedString>
-#include <KAboutData>
 
 K_PLUGIN_CLASS_WITH_JSON(KCMFormats, "metadata.json")
 
 KCMFormats::KCMFormats(QObject *parent, const QVariantList &args)
     : KQuickAddons::ManagedConfigModule(parent, args)
+    , m_settings(new FormatsSettings(this))
     , m_localeModel(new LocaleListModel(this))
 {
     KAboutData *aboutData = new KAboutData(QStringLiteral("kcm_formats"),
@@ -51,7 +53,7 @@ void KCMFormats::setLangIndex(int index)
         return;
 
     m_langIndex = index;
-    if (!m_detail) {
+    if (!detailed()) {
         m_numericIndex = index;
         m_timeIndex = index;
         m_monetaryIndex = index;
@@ -60,6 +62,8 @@ void KCMFormats::setLangIndex(int index)
         update();
     } else
         Q_EMIT langIndexChanged();
+
+    m_settings->setLANG(m_localeModel->localeAt(m_langIndex).name());
 }
 bool countryLessThan(const QLocale &c1, const QLocale &c2)
 {
@@ -107,9 +111,6 @@ QString KCMFormats::loadFlagIcon(const QString &flagCode)
     return icon;
 }
 
-const static QString configFile = QStringLiteral("plasma-localerc");
-const static QString exportFile = QStringLiteral("plasma-locale-settings.sh");
-
 const static QString lcLang = QStringLiteral("LANG");
 const static QString lcNumeric = QStringLiteral("LC_NUMERIC");
 const static QString lcTime = QStringLiteral("LC_TIME");
@@ -122,19 +123,20 @@ const static QString lcLanguage = QStringLiteral("LANGUAGE");
 
 void KCMFormats::readConfig()
 {
-    m_config = KConfigGroup(KSharedConfig::openConfig(configFile), "Formats");
+    static auto readWithDefault = [](const QString &lhs, const QString &rhs) {
+        if (lhs.isEmpty())
+            return QString::fromUtf8(qgetenv(rhs.toLatin1().data()));
+        else
+            return lhs;
+    };
+    QLocale lang_locale(readWithDefault(m_settings->lANG(), lcLang));
+    QLocale numeric_locale(readWithDefault(m_settings->lC_NUMERIC(), lcNumeric));
+    QLocale time_locale(readWithDefault(m_settings->lC_TIME(), lcTime));
+    QLocale collate_locale(readWithDefault(m_settings->lC_COLLATE(), lcCollate));
+    QLocale monetary_locale(readWithDefault(m_settings->lC_MONETARY(), lcMonetary));
+    QLocale measurement_locale(readWithDefault(m_settings->lC_MEASUREMENT(), lcMeasurement));
 
-    m_detail = m_config.readEntry("useDetailed", false);
-    Q_EMIT detailedChanged();
-
-    QLocale lang_locale(m_config.readEntry(lcLang, QString::fromUtf8(qgetenv(lcLang.toLatin1().data()))));
-    QLocale numeric_locale(m_config.readEntry(lcLang, QString::fromUtf8(qgetenv(lcNumeric.toLatin1().data()))));
-    QLocale time_locale(m_config.readEntry(lcLang, QString::fromUtf8(qgetenv(lcTime.toLatin1().data()))));
-    QLocale collate_locale(m_config.readEntry(lcLang, QString::fromUtf8(qgetenv(lcCollate.toLatin1().data()))));
-    QLocale monetary_locale(m_config.readEntry(lcLang, QString::fromUtf8(qgetenv(lcMonetary.toLatin1().data()))));
-    QLocale measurement_locale(m_config.readEntry(lcLang, QString::fromUtf8(qgetenv(lcMeasurement.toLatin1().data()))));
-
-    m_langIndex = m_localeModel->findIndexFromLocale(lang_locale);
+    setLangIndex(m_localeModel->findIndexFromLocale(lang_locale));
     m_numericIndex = m_localeModel->findIndexFromLocale(numeric_locale);
     m_timeIndex = m_localeModel->findIndexFromLocale(time_locale);
     m_collateIndex = m_localeModel->findIndexFromLocale(collate_locale);
@@ -144,83 +146,40 @@ void KCMFormats::readConfig()
     update();
 }
 
-void KCMFormats::writeConfig()
-{
-    m_config = KConfigGroup(KSharedConfig::openConfig(configFile), "Formats");
-
-    const QString global = m_localeModel->localeAt(m_langIndex).name();
-
-    if (m_detail) {
-        // Global setting, clean up config
-        m_config.deleteEntry("useDetailed");
-        if (global.isEmpty()) {
-            m_config.deleteEntry(lcLang);
-        } else {
-            m_config.writeEntry(lcLang, global);
-        }
-        m_config.deleteEntry(lcNumeric);
-        m_config.deleteEntry(lcTime);
-        m_config.deleteEntry(lcMonetary);
-        m_config.deleteEntry(lcMeasurement);
-        m_config.deleteEntry(lcCollate);
-        m_config.deleteEntry(lcCtype);
-    } else {
-        // Save detailed settings
-        m_config.writeEntry("useDetailed", true);
-
-        if (global.isEmpty()) {
-            m_config.deleteEntry(lcLang);
-        } else {
-            m_config.writeEntry(lcLang, global);
-        }
-
-        const QString numeric = m_localeModel->localeAt(m_numericIndex).name();
-        if (numeric.isEmpty()) {
-            m_config.deleteEntry(lcNumeric);
-        } else {
-            m_config.writeEntry(lcNumeric, numeric);
-        }
-
-        const QString time = m_localeModel->localeAt(m_timeIndex).name();
-        if (time.isEmpty()) {
-            m_config.deleteEntry(lcTime);
-        } else {
-            m_config.writeEntry(lcTime, time);
-        }
-
-        const QString monetary = m_localeModel->localeAt(m_monetaryIndex).name();
-        if (monetary.isEmpty()) {
-            m_config.deleteEntry(lcMonetary);
-        } else {
-            m_config.writeEntry(lcMonetary, monetary);
-        }
-
-        const QString measurement = m_localeModel->localeAt(m_measurementIndex).name();
-        if (measurement.isEmpty()) {
-            m_config.deleteEntry(lcMeasurement);
-        } else {
-            m_config.writeEntry(lcMeasurement, measurement);
-        }
-
-        const QString collate = m_localeModel->localeAt(m_collateIndex).name();
-        if (collate.isEmpty()) {
-            m_config.deleteEntry(lcCollate);
-        } else {
-            m_config.writeEntry(lcCollate, collate);
-        }
-    }
-
-    m_config.sync();
-}
-
 void KCMFormats::save()
 {
-    writeConfig();
     Q_EMIT saveClicked();
-    //    KMessageBox::information(this,
-    //                             i18n("Your changes will take effect the next time you log in."),
-    //                             i18n("Format Settings Changed"),
-    //                             QStringLiteral("FormatSettingsChanged"));
+    const QString global = m_localeModel->localeAt(m_langIndex).name();
+
+    m_settings->setLANG(global);
+    if (!m_settings->useDetailed()) {
+        // Global setting, clean up config
+        m_settings->setLC_NUMERIC({});
+        m_settings->setLC_TIME({});
+        m_settings->setLC_MONETARY({});
+        m_settings->setLC_MEASUREMENT({});
+        m_settings->setLC_COLLATE({});
+        m_settings->setLC_CTYPE({});
+    } else {
+        // Save detailed settings
+
+        const QString numeric = m_localeModel->localeAt(m_numericIndex).name();
+        m_settings->setLC_NUMERIC(numeric);
+
+        const QString time = m_localeModel->localeAt(m_timeIndex).name();
+        m_settings->setLC_TIME(time);
+
+        const QString monetary = m_localeModel->localeAt(m_monetaryIndex).name();
+        m_settings->setLC_MONETARY(monetary);
+
+        const QString measurement = m_localeModel->localeAt(m_measurementIndex).name();
+        m_settings->setLC_MEASUREMENT(measurement);
+
+        const QString collate = m_localeModel->localeAt(m_collateIndex).name();
+        m_settings->setLC_COLLATE(collate);
+    }
+
+    KQuickAddons::ManagedConfigModule::save();
 }
 
 void KCMFormats::defaults()
@@ -240,5 +199,93 @@ void KCMFormats::update()
     Q_EMIT collateExampleChanged();
     Q_EMIT monetaryExampleChanged();
     Q_EMIT measurementExampleChanged();
+}
+bool KCMFormats::detailed() const
+{
+    return m_settings->useDetailed();
+}
+void KCMFormats::setDetailed(bool detailed)
+{
+    m_settings->setUseDetailed(detailed);
+}
+int KCMFormats::langIndex() const
+{
+    return m_langIndex;
+}
+int KCMFormats::numericIndex() const
+{
+    return m_numericIndex;
+}
+void KCMFormats::setNumericIndex(int index)
+{
+    m_numericIndex = index;
+    Q_EMIT numericExampleChanged();
+}
+int KCMFormats::timeIndex() const
+{
+    return m_timeIndex;
+}
+void KCMFormats::setTimeIndex(int index)
+{
+    m_timeIndex = index;
+    Q_EMIT timeExampleChanged();
+}
+int KCMFormats::collateIndex() const
+{
+    return m_collateIndex;
+}
+void KCMFormats::setCollateIndex(int index)
+{
+    m_collateIndex = index;
+    Q_EMIT collateExampleChanged();
+}
+int KCMFormats::monetaryIndex() const
+{
+    return m_monetaryIndex;
+}
+void KCMFormats::setMonetaryIndex(int index)
+{
+    m_monetaryIndex = index;
+    Q_EMIT monetaryExampleChanged();
+}
+int KCMFormats::measurementIndex() const
+{
+    return m_measurementIndex;
+}
+void KCMFormats::setMeasurementIndex(int index)
+{
+    m_measurementIndex = index;
+    Q_EMIT measurementExampleChanged();
+}
+QString KCMFormats::numberExample() const
+{
+    return m_localeModel->localeAt(m_numericIndex).toString(1000.01);
+}
+QString KCMFormats::timeExample() const
+{
+    auto tloc = m_localeModel->localeAt(m_timeIndex);
+    return i18n("%1 (long format)", tloc.toString(QDateTime::currentDateTime())) + QLatin1Char('\n')
+        + i18n("%1 (short format)", tloc.toString(QDateTime::currentDateTime(), QLocale::ShortFormat));
+}
+QString KCMFormats::currencyExample() const
+{
+    return m_localeModel->localeAt(m_monetaryIndex).toCurrencyString(24.00);
+}
+QString KCMFormats::measurementExample() const
+{
+    auto mloc = m_localeModel->localeAt(m_measurementIndex);
+    QString measurementExample;
+    if (mloc.measurementSystem() == QLocale::ImperialUKSystem) {
+        measurementExample = i18nc("Measurement combobox", "Imperial UK");
+    } else if (mloc.measurementSystem() == QLocale::ImperialUSSystem || mloc.measurementSystem() == QLocale::ImperialSystem) {
+        measurementExample = i18nc("Measurement combobox", "Imperial US");
+    } else {
+        measurementExample = i18nc("Measurement combobox", "Metric");
+    }
+    return measurementExample;
+}
+FormatsSettings *KCMFormats::settings() const
+{
+    return m_settings;
 }
 #include "kcmformats.moc"
