@@ -29,7 +29,7 @@ PlasmaCore.FrameSvgItem {
     property bool animationEnabled: true
     property var highlightedItem: null
 
-    property var containerLayoutObject: {
+    property var containerMargins: {
         var item = currentItemHighLight;
         while (item.parent) {
             item = item.parent;
@@ -129,25 +129,16 @@ PlasmaCore.FrameSvgItem {
         }
 
         const p = parent.mapFromItem(nextItem, 0, 0);
-        width = nextItem.width
-        height = nextItem.height
-        if (containerLayoutObject && (parent.oneRowOrColumn || forceEdgeHighlight)) {
-            switch (location) {
-                case PlasmaCore.Types.LeftEdge:
-                case PlasmaCore.Types.RightEdge:
-                    x = p.x - containerLayoutObject('left');
-                    y = p.y;
-                    width += containerLayoutObject('left') + containerLayoutObject('right');
-                    break;
-                case PlasmaCore.Types.TopEdge:
-                default:
-                    x = p.x;
-                    y = p.y - containerLayoutObject('top');
-                    height += containerLayoutObject('bottom') + containerLayoutObject('top');
-            }
+        if (containerMargins && (parent.oneRowOrColumn || forceEdgeHighlight)) {
+            x = p.x - containerMargins('left', true);
+            y = p.y - containerMargins('top', true);
+            width = nextItem.width + containerMargins('left', true) + containerMargins('right', true);
+            height = nextItem.height + containerMargins('bottom', true) + containerMargins('top', true);
         } else {
             x = p.x;
             y = p.y;
+            width = nextItem.width
+            height = nextItem.height
         }
 
         highlightedItem = nextItem;
