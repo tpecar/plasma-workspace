@@ -29,6 +29,17 @@ PlasmaCore.FrameSvgItem {
     property bool animationEnabled: true
     property var highlightedItem: null
 
+    property var containerLayoutObject: {
+        var item = currentItemHighLight;
+        while (item.parent) {
+            item = item.parent;
+            if (item.isAppletContainer) {
+                return item.getMargins;
+            }
+        }
+        return undefined;
+    }
+
     z: -1 // always draw behind icons
     opacity: systemTrayState.expanded ? 1 : 0
 
@@ -101,30 +112,45 @@ PlasmaCore.FrameSvgItem {
     function updateHighlightedItem() {
         if (systemTrayState.expanded) {
             if (systemTrayState.activeApplet && systemTrayState.activeApplet.parent && systemTrayState.activeApplet.parent.inVisibleLayout) {
-                changeHighlightedItem(systemTrayState.activeApplet.parent.container);
+                changeHighlightedItem(systemTrayState.activeApplet.parent.container, false);
             } else { // 'Show hiden items' popup
-                changeHighlightedItem(parent);
+                changeHighlightedItem(parent, true);
             }
         } else {
             highlightedItem = null;
         }
     }
 
-    function changeHighlightedItem(nextItem) {
+    function changeHighlightedItem(nextItem, forceEdgeHighlight) {
         // do not animate the first appearance
         // or when the property value of a highlighted item changes
         if (!highlightedItem || (highlightedItem === nextItem)) {
             animationEnabled = false;
         }
 
+        const p = parent.mapFromItem(nextItem, 0, 0);
+        width = nextItem.width
+        height = nextItem.height
+        if (containerLayoutObject && (parent.oneRowOrColumn || forceEdgeHighlight)) {
+            switch (location) {
+                case PlasmaCore.Types.LeftEdge:
+                case PlasmaCore.Types.RightEdge:
+                    x = p.x - containerLayoutObject('left');
+                    y = p.y;
+                    width += containerLayoutObject('left') + containerLayoutObject('right');
+                    break;
+                case PlasmaCore.Types.TopEdge:
+                default:
+                    x = p.x;
+                    y = p.y - containerLayoutObject('top');
+                    height += containerLayoutObject('bottom') + containerLayoutObject('top');
+            }
+        } else {
+            x = p.x;
+            y = p.y;
+        }
+
         highlightedItem = nextItem;
-
-        const p = parent.mapFromItem(highlightedItem, 0, 0)
-        x = p.x;
-        y = p.y;
-        width = highlightedItem.width
-        height = highlightedItem.height
-
         animationEnabled = true;
     }
 
