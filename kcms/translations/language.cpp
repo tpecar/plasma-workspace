@@ -180,4 +180,16 @@ void Language::complete()
 #endif
 }
 
+Language::Language(QString code_, State state_, QObject *parent)
+    : QObject(parent)
+    , code(std::move(code_))
+    , state(state_)
+{
+}
+
+Language::Language(QString code_, QObject *parent)
+    : Language(std::move(code_), State::Complete, parent)
+{
+}
+
 #include "language.moc"

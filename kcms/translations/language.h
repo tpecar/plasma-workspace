@@ -18,17 +18,8 @@ public:
     };
     Q_ENUM(State);
 
-    explicit Language(QString code_, QObject *parent = nullptr)
-        : Language(std::move(code_), State::Complete, parent)
-    {
-    }
-
-    explicit Language(QString code_, State state_, QObject *parent = nullptr)
-        : QObject(parent)
-        , code(std::move(code_))
-        , state(state_)
-    {
-    }
+    explicit Language(QString code_, QObject *parent = nullptr);
+    explicit Language(QString code_, State state_, QObject *parent = nullptr);
 
     const QString code;
     State state = State::Complete;
