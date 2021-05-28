@@ -30,7 +30,7 @@ PlasmaCore.FrameSvgItem {
     property var highlightedItem: null
 
     property var containerMargins: {
-        var item = currentItemHighLight;
+        let item = currentItemHighLight;
         while (item.parent) {
             item = item.parent;
             if (item.isAppletContainer) {
