@@ -8,10 +8,10 @@ import QtQuick.Controls 2.12
 import org.kde.kirigami 2.7 as Kirigami
 ComboBox {
     id: control
-    width: 300
     model: kcm.localeModel
     textRole: "display"
     delegate: Kirigami.BasicListItem {
+        width: control.width
         icon: kcm.localeModel.getFlag(index)
         iconSize: Kirigami.Units.gridUnit
         label: kcm.localeModel.getText(index)

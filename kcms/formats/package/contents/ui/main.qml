@@ -12,104 +12,87 @@ import org.kde.kcm 1.2
 
 SimpleKCM {
     id: root
-    implicitHeight: 500
+    implicitHeight: formLayout.height + footer.height + Kirigami.Units.gridUnit * 3
     Kirigami.FormLayout {
-        RowLayout {
-            Label {
-                text: i18n("Region:")
-            }
-            FormatComboBox {
-                id: langCombo
-                currentIndex: kcm.langIndex
-                onCurrentIndexChanged: kcm.langIndex = currentIndex
-            }
+        id: formLayout
+        width: parent.width
+        FormatComboBox {
+            id: langCombo
+            Kirigami.FormData.label: i18n("Region: ")
+            Layout.fillWidth: true
+            currentIndex: kcm.langIndex
+            onCurrentIndexChanged: kcm.langIndex = currentIndex
         }
+
         
         CheckBox {
             id: detailCheckBox
             checked: kcm.detailed
             onCheckedChanged: if (kcm.detailed != checked) kcm.detailed = checked
-            text: i18n("detail")
+            Kirigami.FormData.label: i18n("Detailed Settings ")
         }
         
-        RowLayout {
-            Label {
-                enabled: detailCheckBox.checked
-                text: i18n("Numbers:")
-                color: enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
-            }
-            FormatComboBox {
-                id: numericCombo
-                enabled: detailCheckBox.checked
-                currentIndex: kcm.numericIndex
-                displayText: !detailCheckBox.checked ? i18n("No change") : currentText
-                onCurrentIndexChanged: kcm.numericIndex = currentIndex
-            }
-        }
-        
-        RowLayout {
-            Label {
-                enabled: detailCheckBox.checked
-                text: i18n("Time:")
-                color: enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
-            }
-            FormatComboBox {
-                id: timeCombo
-                enabled: detailCheckBox.checked
-                currentIndex: kcm.timeIndex
-                displayText: !detailCheckBox.checked ? i18n("No change") : currentText
-                onCurrentIndexChanged: kcm.timeIndex = currentIndex
-            }
-        }
-        
-        RowLayout {
-            Label {
-                enabled: detailCheckBox.checked
-                text: i18n("Currency:")
-                color: enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
-            }
-            FormatComboBox {
-                id: monetaryCombo
-                enabled: detailCheckBox.checked
-                currentIndex: kcm.monetaryIndex
-                displayText: !detailCheckBox.checked ? i18n("No change") : currentText
-                onCurrentIndexChanged: kcm.monetaryIndex = currentIndex
-            }
-        }
-        
-        RowLayout {
-            Label {
-                enabled: detailCheckBox.checked
-                text: i18n("Measurement Units:")
-                color: enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
-            }
-            FormatComboBox {
-                id: measurementCombo
-                enabled: detailCheckBox.checked
-                currentIndex: kcm.measurementIndex
-                displayText: !detailCheckBox.checked ? i18n("No change") : currentText
-                onCurrentIndexChanged: kcm.measurementIndex = currentIndex
-            }
-        }
-        RowLayout {
-            Label {
-                enabled: detailCheckBox.checked
-                text: i18n("Collation and Sorting:")
-                color: enabled ? Kirigami.Theme.textColor : Kirigami.Theme.disabledTextColor
-            }
-            FormatComboBox {
-                id: collateCombo
-                enabled: detailCheckBox.checked
-                currentIndex: kcm.collateIndex
-                displayText: !detailCheckBox.checked ? i18n("No change") : currentText
-                onCurrentIndexChanged: kcm.collateIndex = currentIndex
-            }
+        FormatComboBox {
+            id: numericCombo
+            Kirigami.FormData.label: i18n("Numbers: ")
+            Layout.fillWidth: true
+            enabled: detailCheckBox.checked
+            Kirigami.FormData.enabled: detailCheckBox.checked
+            currentIndex: kcm.numericIndex
+            displayText: !detailCheckBox.checked ? i18n("No change") : currentText
+            onCurrentIndexChanged: kcm.numericIndex = currentIndex
         }
 
-        Label {
-            text: i18n("Description")
-            font.bold: true
+        
+        FormatComboBox {
+            id: timeCombo
+            Kirigami.FormData.label: i18n("Time: ")
+            Layout.fillWidth: true
+            enabled: detailCheckBox.checked
+            currentIndex: kcm.timeIndex
+            displayText: !detailCheckBox.checked ? i18n("No change") : currentText
+            onCurrentIndexChanged: kcm.timeIndex = currentIndex
         }
+
+        
+
+        FormatComboBox {
+            id: monetaryCombo
+            Kirigami.FormData.label: i18n("Currency: ")
+            Layout.fillWidth: true
+            enabled: detailCheckBox.checked
+            currentIndex: kcm.monetaryIndex
+            displayText: !detailCheckBox.checked ? i18n("No change") : currentText
+            onCurrentIndexChanged: kcm.monetaryIndex = currentIndex
+        }
+
+        
+        FormatComboBox {
+            id: measurementCombo
+            Kirigami.FormData.label: i18n("Measurement Units: ")
+            Layout.fillWidth: true
+            enabled: detailCheckBox.checked
+            currentIndex: kcm.measurementIndex
+            displayText: !detailCheckBox.checked ? i18n("No change") : currentText
+            onCurrentIndexChanged: kcm.measurementIndex = currentIndex
+        }
+
+
+        FormatComboBox {
+            id: collateCombo
+            Kirigami.FormData.label: i18n("Collation and Sorting: ")
+            Layout.fillWidth: true
+            enabled: detailCheckBox.checked
+            currentIndex: kcm.collateIndex
+            displayText: !detailCheckBox.checked ? i18n("No change") : currentText
+            onCurrentIndexChanged: kcm.collateIndex = currentIndex
+        }
+
+        Kirigami.Separator {
+            Kirigami.FormData.label: i18n("Description")
+            Kirigami.FormData.isSection: true
+        }
+
         Label {
             text: i18n("Numbers: ") + kcm.numberExample
         }
@@ -125,7 +108,7 @@ SimpleKCM {
     }
 
 
-    header: Kirigami.InlineMessage {
+    footer: Kirigami.InlineMessage {
         id: message
         text: i18n("Your changes will take effect the next time you log in.")
         type: Kirigami.MessageType.Positive
