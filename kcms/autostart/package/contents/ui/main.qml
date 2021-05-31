@@ -57,12 +57,17 @@ KCM.ScrollViewKCM {
                     errorMessage.visible = false
                 }
             }
-            function onNonExecutableScript(fileName) {
+            function onNonExecutableScript(fileName, kind) {
                 fixItAction.fileName = fileName
                 errorMessage.type = Kirigami.MessageType.Warning
                 errorMessage.visible = true
                 errorMessage.actions = [fixItAction]
-                errorMessage.text = i18nd("kcm_autostart", "The file '%1' is not executable", fileName)
+
+                if (kind === AutostartModel.PlasmaShutdown) {
+                    errorMessage.text = i18nd("kcm_autostart", "The file '%1' must be executable to run at logout.", fileName)
+                } else {                                                 '  '
+                    errorMessage.text = i18nd("kcm_autostart", "The file '%1' must be executable to run at login.", fileName)
+                }
             }
         }
 

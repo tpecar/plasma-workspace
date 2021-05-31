@@ -311,7 +311,7 @@ void AutostartModel::addScript(const QUrl &url, AutostartModel::AutostartEntrySo
     QFile scriptFile(url.toLocalFile());
 
     if (!(scriptFile.permissions() & QFile::ExeUser)) {
-        Q_EMIT nonExecutableScript(url.toLocalFile());
+        Q_EMIT nonExecutableScript(url.toLocalFile(), kind);
     }
 
     const QString fileName = url.fileName();

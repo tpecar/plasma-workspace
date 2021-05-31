@@ -68,7 +68,7 @@ public:
 
 Q_SIGNALS:
     void error(const QString &message);
-    void nonExecutableScript(const QString &fileName);
+    void nonExecutableScript(const QString &fileName, AutostartModel::AutostartEntrySource kind);
 
 private:
     void addApplication(const KService::Ptr &service);
