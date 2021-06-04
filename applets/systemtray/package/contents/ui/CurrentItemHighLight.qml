@@ -110,11 +110,12 @@ PlasmaCore.FrameSvgItem {
     }
 
     function updateHighlightedItem() {
+        var forceEdgeHighlight;
         if (systemTrayState.expanded) {
             if (systemTrayState.activeApplet && systemTrayState.activeApplet.parent && systemTrayState.activeApplet.parent.inVisibleLayout) {
-                changeHighlightedItem(systemTrayState.activeApplet.parent.container, false);
+                changeHighlightedItem(systemTrayState.activeApplet.parent.container, forceEdgeHighlight=false);
             } else { // 'Show hiden items' popup
-                changeHighlightedItem(parent, true);
+                changeHighlightedItem(parent, forceEdgeHighlight=true);
             }
         } else {
             highlightedItem = null;
@@ -127,13 +128,14 @@ PlasmaCore.FrameSvgItem {
         if (!highlightedItem || (highlightedItem === nextItem)) {
             animationEnabled = false;
         }
+        var returnAllMargins;
 
         const p = parent.mapFromItem(nextItem, 0, 0);
         if (containerMargins && (parent.oneRowOrColumn || forceEdgeHighlight)) {
-            x = p.x - containerMargins('left', true);
-            y = p.y - containerMargins('top', true);
-            width = nextItem.width + containerMargins('left', true) + containerMargins('right', true);
-            height = nextItem.height + containerMargins('bottom', true) + containerMargins('top', true);
+            x = p.x - containerMargins('left', returnAllMargins=true);
+            y = p.y - containerMargins('top', returnAllMargins=true);
+            width = nextItem.width + containerMargins('left', returnAllMargins=true) + containerMargins('right', true);
+            height = nextItem.height + containerMargins('bottom', returnAllMargins=true) + containerMargins('top', true);
         } else {
             x = p.x;
             y = p.y;
