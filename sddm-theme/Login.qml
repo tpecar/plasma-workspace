@@ -83,6 +83,8 @@ SessionManagementScreen {
                 }
             }
 
+            visible: userList.currentItem.m.needsPassword
+
             Keys.onEscapePressed: {
                 mainStack.currentItem.forceActiveFocus();
             }
@@ -115,10 +117,13 @@ SessionManagementScreen {
             implicitHeight: passwordBox.height - units.smallSpacing * 0.5 // otherwise it comes out taller than the password field
             Layout.rightMargin: 1 // prevents it from extending beyond the username field
 
+            text: userList.currentItem.m.needsPassword ? "" : "Press to login"
+
             PlasmaCore.IconItem { // no iconSource because if you take away half a unit (implicitHeight), "go-next" gets cut off
                 anchors.fill: parent
                 anchors.margins: units.smallSpacing
                 source: "go-next"
+                visible: parent.text.length == 0
             }
             onClicked: startLogin();
         }
